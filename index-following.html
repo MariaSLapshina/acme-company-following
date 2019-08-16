@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src =https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js></script>
+    <script src = https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js></script>
+
+</head>
+<body>
+    <div id = 'root'></div>
+</body>
+
+<script type = 'text/babel'>
+    const randomUser = 'https://acme-users-api-rev.herokuapp.com/api';
+  //  const followingComp = 'https://acme-users-api-rev.herokuapp.com/api/users/688237a5-1048-4845-8bba-4486257a2997/followingCompanies';
+
+    const fetchUser = async ()=> {
+      const storage = window.localStorage;
+      const userId = storage.getItem('userId'); 
+      if(userId){
+        try {
+          return (await axios.get(`${randomUser}/users/detail/${userId}`)).data;
+        }
+        catch(ex){
+          storage.removeItem('userId');
+          return fetchUser();
+        }
+      }
+      const user = (await axios.get(`${randomUser}/users/random`)).data;
+      storage.setItem('userId', user.id);
+      return  user;
+    };
+  
+    
+    const { Component } = React;
+    const { render } = ReactDOM;
+    const root = document.querySelector('#root');
+    class App extends Component {
+        constructor(){
+            super();
+            this.state = {
+              user: {}
+            }
+        }
+        componentDidMount(){
+          fetchUser()
+          .then(response => this.setState(response))
+
+        }
+        render(){
+          const { user } = this.state;
+          return (
+            <h1>{user}</h1>
+          )
+        
+        }  
+    }
+render(<App/>,root)
+</script>
+</html>
