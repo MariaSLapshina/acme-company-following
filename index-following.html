@@ -6,7 +6,17 @@
     <script src =https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js></script>
     <script src = https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js></script>
     <script src ='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js'></script>
-
+    <style>
+    form{
+      border-bottom: 1px solid black;
+      padding: 1rem;
+      margin:1rem;
+      justify-items: center
+    }
+    select{
+      size: 2rem
+    }
+    </style>
 </head>
 <body>
   <h1>Acme Company Follower</h1>
@@ -37,31 +47,23 @@
       return  user;
     };
     
-    const Main = ({user, followingCompanies, companies})=>{
-      const choices = [, 1, 2, 3, 4, 5]
-      console.log(followingCompanies)
+    const Top = ({user, followingCompanies, companies})=>{
       return(
-        <div>
         <div> You ( {user.fullName}) are following {followingCompanies.length} companies
-        </div>
-        <div>
-        {
-          companies.map((company, idx)=>
-            <div key={idx}>
-              <form>
-                <div>{company.name}</div>
-                <select> 
-                  <option> 4
-                  </option>
-                </select>
-              </form>
-            <hr/>
-            </div>)
-        }
-        </div>
-      </div>
+          </div>
       )
     }
+      const Companies = ({followingCompanies, companies}) =>{
+      const options = ['', 1, 2, 3, 4, 5]
+      return(
+        <div>
+          {
+            companies.map(company => <form key={company.id} className='company-name' ><div>{company.name}</div> <select>{options.map((option,idx) => <option key={idx}>{option}</option>)}</select></form>)
+          }
+        </div>
+      )
+      }
+
     class App extends Component {
         constructor(){
             super();
@@ -76,13 +78,13 @@
          const followingCompanies = (await axios.get(`${randomUser}/users/${user.id}/followingCompanies`)).data
          const companies = (await axios.get(`${randomUser}/companies`)).data
          this.setState({user, followingCompanies, companies})
-         console.log(this.state)
         }
         render(){
           const {user, followingCompanies, companies} = this.state
           return (
             <HashRouter>
-            <Route render={(props) =><Main {...props} user={user} followingCompanies ={ followingCompanies} companies={companies}/> }/>
+            <Route render={() =><Top user={user} followingCompanies ={ followingCompanies} companies={companies}/> }/>
+            <Route render ={() => <Companies companies={companies} followingCompanies ={ followingCompanies} />} />
             </HashRouter>
           )
         }  
