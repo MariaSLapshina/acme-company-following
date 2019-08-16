@@ -5,6 +5,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src =https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js></script>
     <script src = https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js></script>
+    <script src ='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js'></script>
 
 </head>
 <body>
@@ -13,6 +14,8 @@
 
 <script type = 'text/babel'>
     const randomUser = 'https://acme-users-api-rev.herokuapp.com/api';
+    const {HashRouter, Switch, Redirect, Link, Route} = ReactRouterDOM;
+    
   //  const followingComp = 'https://acme-users-api-rev.herokuapp.com/api/users/688237a5-1048-4845-8bba-4486257a2997/followingCompanies';
 
     const fetchUser = async ()=> {
@@ -31,8 +34,27 @@
       storage.setItem('userId', user.id);
       return  user;
     };
-  
+
+    // const FetchCompanies = ({user})=>{
+    //   axios.get(axios.get(`${randomUser}/users/${id}/followingCompanies`)
+    //   .then(response=>response.data)
+    // }
     
+    const Thing = ({user, followingCompanies, companies})=>{
+      
+      return(
+        <div>
+        <div> You ({user.fullName}) are following {followingCompanies.length} companies</div>
+        <ul>
+        {
+          companies.map((company,idx)=>{
+            <li key={idx}>{company.name}</li>
+          })
+        }
+        </ul>
+      </div>
+      )
+    }
     const { Component } = React;
     const { render } = ReactDOM;
     const root = document.querySelector('#root');
@@ -40,20 +62,25 @@
         constructor(){
             super();
             this.state = {
-              user: {}
+              user:[],
+              followingCompanies: [],
+              companies:[]
             }
         }
-        componentDidMount(){
-          fetchUser()
-          .then(response => this.setState(response))
-
+        async componentDidMount(){
+         const user = await fetchUser()
+         const followingCompanies = (await axios.get(`${randomUser}/users/${user.id}/followingCompanies`)).data
+         const companies = (await axios.get(`${randomUser}/companies`)).data
+         this.setState({user, followingCompanies, companies})
+         console.log(this.state)
         }
         render(){
-          const { user } = this.state;
+          const {user, followingCompanies, companies} = this.state
           return (
-            <h1>{user}</h1>
+            <HashRouter>
+            <Route render={() =><Thing user={user} followingCompanies ={ followingCompanies} companies={companies}/> }/>
+            </HashRouter>
           )
-        
         }  
     }
 render(<App/>,root)
