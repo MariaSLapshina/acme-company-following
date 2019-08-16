@@ -9,14 +9,16 @@
 
 </head>
 <body>
+  <h1>Acme Company Follower</h1>
     <div id = 'root'></div>
 </body>
 
 <script type = 'text/babel'>
     const randomUser = 'https://acme-users-api-rev.herokuapp.com/api';
     const {HashRouter, Switch, Redirect, Link, Route} = ReactRouterDOM;
-    
-  //  const followingComp = 'https://acme-users-api-rev.herokuapp.com/api/users/688237a5-1048-4845-8bba-4486257a2997/followingCompanies';
+    const { Component } = React;
+    const { render } = ReactDOM;
+    const root = document.querySelector('#root');
 
     const fetchUser = async ()=> {
       const storage = window.localStorage;
@@ -34,30 +36,32 @@
       storage.setItem('userId', user.id);
       return  user;
     };
-
-    // const FetchCompanies = ({user})=>{
-    //   axios.get(axios.get(`${randomUser}/users/${id}/followingCompanies`)
-    //   .then(response=>response.data)
-    // }
     
-    const Thing = ({user, followingCompanies, companies})=>{
-      
+    const Main = ({user, followingCompanies, companies})=>{
+      const choices = [, 1, 2, 3, 4, 5]
+      console.log(followingCompanies)
       return(
         <div>
-        <div> You ({user.fullName}) are following {followingCompanies.length} companies</div>
-        <ul>
+        <div> You ( {user.fullName}) are following {followingCompanies.length} companies
+        </div>
+        <div>
         {
-          companies.map((company,idx)=>{
-            <li key={idx}>{company.name}</li>
-          })
+          companies.map((company, idx)=>
+            <div key={idx}>
+              <form>
+                <div>{company.name}</div>
+                <select> 
+                  <option> 4
+                  </option>
+                </select>
+              </form>
+            <hr/>
+            </div>)
         }
-        </ul>
+        </div>
       </div>
       )
     }
-    const { Component } = React;
-    const { render } = ReactDOM;
-    const root = document.querySelector('#root');
     class App extends Component {
         constructor(){
             super();
@@ -78,7 +82,7 @@
           const {user, followingCompanies, companies} = this.state
           return (
             <HashRouter>
-            <Route render={() =><Thing user={user} followingCompanies ={ followingCompanies} companies={companies}/> }/>
+            <Route render={(props) =><Main {...props} user={user} followingCompanies ={ followingCompanies} companies={companies}/> }/>
             </HashRouter>
           )
         }  
